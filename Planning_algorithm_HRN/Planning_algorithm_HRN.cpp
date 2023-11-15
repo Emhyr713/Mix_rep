@@ -7,12 +7,11 @@ using namespace std;
 
 // magic number
 int const MAX = 32;
-// Имя файлика
-
 
 int count_process = 20;
 int print_flag = 1;
 
+// Имя файлика
 //const char file_name[] = "massive_thread.txt";
 const char file_name[] = "massive_20.txt";
 //const char file_name[] = "massive_50.txt";
@@ -141,7 +140,6 @@ int find_min_time_ready_FIFO(process(*massive_process)[10000], int count) {
 	if (j > 0) j--;
 	int min_time_ready_process = j;
 	int min_time_ready = (*massive_process)[j].from_bloking_to_readness;
-	//cout << " Start here: " << j << "|";
 	for (int i = 0; i < count; i++)
 	{
 		if ((*massive_process)[i].from_bloking_to_readness < min_time_ready && (*massive_process)[i].process_completion_flag == 0) {
@@ -218,12 +216,6 @@ void algoritm_FIFO(process (*massive_process)[10000], int count, int print_flag)
 		if (print_flag == 1) cout << endl;
 		takts++;
 	}
-	////└────┴────┴────┴────┘
-	//cout << "  " << char(192);
-	//for (int i = 0; i < count; i++) {
-	//	cout << setfill(char(196)) << setw(setWide) << char(193);
-	//}
-	//cout << setw(setWide) << char(217) << endl;
 
 	results(count_ready, count_runtime, count, 0);
 
@@ -249,8 +241,6 @@ void sort_massive(process (*massive_process)[10000], int count, int flag) {
 
 // Поиск максимального приоритета
 int find_max_process_priority(process (*massive_process)[10000], int count) {
-	//int max_priority_process = 0;
-	//int max_priority = (*massive_process)[0].priority;
 	int flag = (*massive_process)[0].process_completion_flag;
 	int j = 0;
 	while (flag == 1 && j < count) {
@@ -260,16 +250,13 @@ int find_max_process_priority(process (*massive_process)[10000], int count) {
 	if (j > 0) j--;
 	int max_priority = -1;
 	int max_priority_process = j;
-	//cout << " Start here: " << j << "|" << "start_priority: " << (*massive_process)[j].priority << " | ";
 	for (int i = j; i < count; i++)
 	{
 		if ((*massive_process)[i].priority > max_priority && (*massive_process)[i].process_completion_flag == 0) {
 			max_priority = (*massive_process)[i].priority;
 			max_priority_process = i;
-			//cout << "max_cur: " << i << " | ";
 		}
 	}
-	//cout << "max: " << (*massive_process)[max_priority_process].num_process << " | ";
 	return (*massive_process)[max_priority_process].num_process;
 }
 
@@ -351,13 +338,10 @@ void algoritm_HRN(process(*massive_process)[10000], int count, int print_flag) {
 		if ((takts + 1) > ((*massive_process)[current_process].from_bloking_to_readness + (*massive_process)[current_process].cpu_burst + (*massive_process)[current_process].offset_process - 1)) {
 			// Расчёт приоритета
 			(*massive_process)[current_process].process_completion_flag = 1;
-			//current_process = find_max_process_priority(massive_process, count);
 			completed_process++;
-			//cout << "current_process: " << current_process << " ";
 			for (int i = 0; i < count; i++) {
 				if ((*massive_process)[i].process_completion_flag == 0 && (takts + 1) > (*massive_process)[i].from_bloking_to_readness)
 					(*massive_process)[i].priority = ((double)(*massive_process)[i].offset_process + (double)(*massive_process)[i].cpu_burst) / (double)(*massive_process)[i].cpu_burst;
-				//if (print_flag == 1) cout << " " << i << ":(" << (*massive_process)[i].process_completion_flag << ") " << (*massive_process)[i].priority << " || ";
 			}
 			current_process = find_max_process_priority(massive_process, count);
 			if (print_flag == 1) cout << " current_process: " << current_process;
@@ -400,27 +384,18 @@ int main() {
 
 	int count = 0;							// Счётчик процессов
 
-	//create_process(count_process, file_name);
-
 	// Инициализация списка
 	process massive_process[10000];				// Новый адрес
 
 	// Чтение из файла
 	read_to_massive(&massive_process, count, file_name);
 
-	// Печать подготовленного списка процессов
-	//if (print_flag == 1) print_massive(&massive_process, count);
-
 	// Реализация Алгоритма FCFS (FIFO)
 	algoritm_FIFO(&massive_process, count, 0);
-
 
 	process massive_process_1[10000];				// Новый адрес
 	// Чтение из файла
 	read_to_massive(&massive_process_1, count, file_name);
-
-	// Печать подготовленного списка процессов
-	//if (print_flag == 1) print_massive(&massive_process_1, count);
 
 	// Реализация Алгоритма HRN
 	algoritm_HRN(&massive_process_1, count, print_flag);
