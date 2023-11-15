@@ -87,9 +87,7 @@ class PageOne(tk.Frame):
                            command=lambda: controller.show_frame("StartPage"))
         button.pack(padx=75, fill="x")
     
-    def ClickButton(self, log, password, Inp, input_login, input_pass, controller):
-        # printLog = "Принят логин:{}".format(login)  
-        # printPass = "Принят пароль:{}".format(password)  
+    def ClickButton(self, log, password, Inp, input_login, input_pass, controller): 
         if(log == "" or password == ""):
             Inp.configure(text = "Введите логин или пароль") 
             return
