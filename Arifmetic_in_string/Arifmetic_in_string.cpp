@@ -19,8 +19,8 @@ int compare(string first_num, string second_num, int print_flag) {
 	int second_num_length = second_num.length();
 
 	int max_lenght = first_num_length;	// Установление максимальной длины
-	int start_different = 0;			// Начало отличия чисел
-	int flag_sign = 1;					// Флаг больше меньше равно (1 -1 0)
+	int start_different = 0;		// Начало отличия чисел
+	int flag_sign = 1;			// Флаг больше меньше равно (1 -1 0)
 
 	if (print_flag == 1) cout << "first_num_length: " << first_num_length << endl;
 	if (print_flag == 1) cout << "second_num_length: " << second_num_length << endl;
@@ -80,10 +80,6 @@ string sum(string first_num, string second_num, int print_flag) {
 
 		// Если разряд переполнился, взять младший разряд
 		if ((flag_overflow = digit / 10) > 0)	digit = digit % 10;
-
-		// Запись в переменную результата
-		//result.insert(result.begin(), char(digit + 48));
-
 		result += char(digit + 48);
 
 		i++;
@@ -105,14 +101,8 @@ string sub(string first_num, string second_num, int print_flag) {
 	if (first_num == second_num)
 		return "0";
 
-	//// Если числа попадают в размер int
-	//if (first_num_length <= 9 && second_num_length <= 9) {
-	//	if (print_flag == 1) cout << "first_num_length = " << first_num_length << " second_num_length = " << second_num_length << endl;
-	//	return to_string(atoi(first_num.c_str()) - atoi(second_num.c_str()));
-	//}
-
 	string result;			// Результат
-	int flag_overflow = 0;	// Флаг переполнения
+	int flag_overflow = 0;		// Флаг переполнения
 	int flag_sign = 0;
 
 	if (print_flag == 1) cout << "first_num_length: " << first_num_length << " second_num_length: " << second_num_length << endl;
@@ -263,12 +253,6 @@ string power_th(string first_num, unsigned long long n) {
 	}
 	mas_n[3] += n % 4;
 
-	//for (int i = 0; i < 4; i++) {
-	//	cout << " mas_n[i]: " << " " << mas_n[i];
-	// 
-	//}
-
-
 	auto fut1 = async(power, first_num, mas_n[0]);
 	auto fut2 = async(power, first_num, mas_n[1]);
 	auto fut3 = async(power, first_num, mas_n[2]);
@@ -324,7 +308,6 @@ string big_mod(string first_num, string second_num, int flag_operation, int prin
 				continue;
 			}
 			// Пока часть Первого числа меньше Второго
-			/*while (compare(sub_first_num, second_num, 0) <= 0 && (i+1) < first_num_length) {*/
 			while (compare(sub_first_num, second_num, 0) < 0 && (i + 1) < first_num_length) {
 				i++;
 				sub_first_num += first_num[i];
@@ -400,8 +383,7 @@ string big_sqrt(string first_num, int print_flag) {
 	}
 	if (compare(mult(sqrt_result, sqrt_result, 0), first_num, 0) > 0)
 		sqrt_result = sub(sqrt_result, "1", 0);
-
-	//cout << "sqrt: " << sqrt << endl;
+	
 	return sqrt_result;
 }
 
@@ -554,10 +536,6 @@ string* generate_coprime(string* nums) {
 		first_num = generate_num(15, 20);
 		second_num = generate_num(15, 20);
 	}
-	//cout << "coprime: " << endl;
-	//cout << "first_num: " << first_num << endl;
-	//cout << "second_num: " << second_num << endl;
-	//cout << "gcd_str(" << first_num << ", " << second_num << "): " << gcd_str(first_num, second_num) << endl;
 	nums[0] = first_num;
 	nums[1] = second_num;
 	return nums;
@@ -582,15 +560,6 @@ int checking_prime_str(string num) {
 		//cout << " ----Nen" << endl << endl;
 		return 0;
 	}
-
-
-	//if (big_mod(num, "2", 1, 0) == "0" || big_mod(num, "3", 1, 0) == "0" ||
-	//	big_mod(num, "5", 1, 0) == "0" || big_mod(num, "7", 1, 0) == "0" ||
-	//	big_mod(num, "11", 1, 0) == "0" || big_mod(num, "13", 1, 0) == "0" ||
-	//	big_mod(num, "17", 1, 0) == "0" || big_mod(num, "19", 1, 0) == "0" ||
-	//	big_mod(num, "23", 1, 0) == "0" || big_mod(num, "29", 1, 0) == "0") {
-	//	return 0;
-	//}
 
 	if ( big_mod(num, "3", 1, 0) == "0" || big_mod(num, "7", 1, 0) == "0" ||
 		big_mod(num, "11", 1, 0) == "0" || big_mod(num, "13", 1, 0) == "0" ||
@@ -719,12 +688,6 @@ int main()
 	fin_pow.close();
 
 
-	//cout << "num_Arifmetic_1: " << num_Arifmetic_1 << " num_Arifmetic_2: " << num_Arifmetic_2 << endl;
-	//cout << "num_prime_int_1: " << num_prime_int_1 << " num_prime_int_2: " << num_prime_int_2 << endl;
-	//cout << "num_prime_str_1: " << num_prime_str_1 << " num_prime_str_2: " << num_prime_str_2 << endl;
-	//cout << "num_pow_1: " << num_pow_1 << " num_pow_2: " << num_pow_2 << endl;
-
-
 	// Сложение, вычитание, умножение, деление, взятие корня
 	ofstream fout_Arifmetic("Output_Arifmetic.txt");
 	fout_Arifmetic << "num_Arifmetic_1: " << num_Arifmetic_1 << endl;
@@ -833,51 +796,5 @@ int main()
 	cout << "gcd_str(" << nums[0] << ", " << nums[1] << "): " << gcd_str(nums[0], nums[1]) << endl;
 	cout << "gcd_str(1242345, 145): " << gcd_str("1242345", "145") << endl;
 
-
-
-	//cout << "first_num: " << first_num << endl;
-	//cout << "second_num: " << second_num << endl;
-	//cout << "_____________________________" << endl;
-	//cout << "sum: " << sum(first_num, second_num, 0) << endl;
-	//cout << "expectation: " << atoi(first_num.c_str()) + atoi(second_num.c_str()) << endl;
-	//cout << "_____________________________" << endl;
-	//cout << "sub: " << sub(first_num, second_num, 0) << endl;
-	//cout << "expectation: " << atoi(first_num.c_str()) - atoi(second_num.c_str()) << endl;
-	//cout << "_____________________________" << endl;
-	//cout << "mult: " << mult(first_num, second_num, 0) << endl;
-	//cout << "expectation: " << atoi(first_num.c_str()) * atoi(second_num.c_str()) << endl;
-	// 
-	//cout << "_____________________________" << endl;
-	//cout << "power: " << power(first_num, atoi(second_num.c_str())) << endl;
-	//cout << "expectation: " << pow(atoi(first_num.c_str()), atoi(second_num.c_str())) << endl;
-
-	//cout << "_____________________________" << endl;
-	//cout << "big_bod / : " << big_mod(first_num, second_num, 0, 0) << endl;
-	//cout << "big_bod % : " << big_mod(first_num, second_num, 1, 0) << endl;
-	//cout << "expectation /: " << atoi(first_num.c_str()) / atoi(second_num.c_str()) << endl;
-	//cout << "expectation %: " << atoi(first_num.c_str()) % atoi(second_num.c_str()) << endl;
-	//cout << "_____________________________" << endl;
-	//cout << "big_sqrt: " << big_sqrt(first_num, 0) << endl;
-	//cout << "expectation: = " << sqrt(atoi(first_num.c_str())) << endl;
-	//cout << "_____________________________" << endl;
-	//cout << "checking_prime: " << checking_prime(18014398241046527) << endl;
-	//cout << "search_prime: " << search_prime(2000) << endl;
-	//cout << "_____________________________" << endl;
-	//cout << "checking_prime_str: " << checking_prime_str("2147483647") << endl;
-	//cout << "search_prime_str: " << search_prime_str(2000) << endl;
-	//cout << "_____________________________" << endl;
-	//cout << "bi_sqrt: " << bi_sqrt(first_num, 0) << endl;
-	//cout << "expectation: = " << sqrt(atoi(first_num.c_str())) << endl;
-	//cout << "_____________________________" << endl;
-	//cout << "gcd: " << gcd(1242345, 145) << endl;
-	//cout << "gcd_str: " << gcd_str("1242345", "145") << endl;
-	//cout << "_____________________________" << endl;
-	//cout << "generate_num: " << generate_num(10, 15) << endl;
-	//cout << "_____________________________" << endl;
-	//cout << "generate_comprime: " << endl;
-	//cout << generate_coprime() << endl;
-	//cout << "_____________________________" << endl;
-	//cout << "generate_mprime: " << generate_prime() << endl;
-	
 	return 0;
 }
