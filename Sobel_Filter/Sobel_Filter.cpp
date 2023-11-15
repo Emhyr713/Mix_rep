@@ -1,112 +1,79 @@
-﻿#include <iostream>
+#include <iostream>
 #include <cmath>
-#include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
-#include <windows.h>                                // Для RGBTRIPLE
-#include <thread>                                   // Поток
-#include <ctime>
+#include <chrono>
+#include <fstream>
 
 using namespace std;
 using namespace cv;
 
-Mat res_im;                                          // Результат
-
-// Вычисляет X градиент
-int xGradient(int buff[3][3])
+void Sobel_Filter(Mat image, Mat res_im, int begin, int end)
 {
-    return buff[0][0] + 2 * buff[1][0] + buff[2][0]
-         - buff[0][2] - 2 * buff[1][2] - buff[2][2];
-}
-
-// Вычисляет Y градиент
-int yGradient(int buff[3][3])
-{
-    return buff[0][0] + 2 * buff[0][1] + buff[0][2]
-         - buff[0][2] - 2 * buff[1][2] - buff[2][2];
-}
-
-int Gradient(Mat image, int x, int y, int height, int width, int key)
-{
-    int buff[3][3];     // Буфер
-  
-    for (int i = 0; i < 3; i++){
-        for (int j = 0; j < 3; j++){
-            if (((x - 1 + i) < 0) || ((y - 1 + j) < 0) || ((x - 1 + i) > width) || ((y - 1 + j) > height))
-                buff[i][j] = 0;
-            else
-                buff[i][j] = image.at<uchar>(y - 1 + j, x - 1 + i);
+    for (int y = begin; y < end; y++)
+    {
+        for (int x = 1; x < image.cols - 1; x++)
+        {
+            int gx = (image.at<uchar>(y - 1, x + 1) + 2 * image.at<uchar>(y, x + 1) + image.at<uchar>(y + 1, x + 1)) -
+                (image.at<uchar>(y - 1, x - 1) + 2 * image.at<uchar>(y, x - 1) + image.at<uchar>(y + 1, x - 1));
+            int gy = (image.at<uchar>(y + 1, x - 1) + 2 * image.at<uchar>(y + 1, x) + image.at<uchar>(y + 1, x + 1)) -
+                (image.at<uchar>(y - 1, x - 1) + 2 * image.at<uchar>(y - 1, x) + image.at<uchar>(y - 1, x + 1));
+            
+            int sum = sqrt(gx * gx + gy * gy);           // √(Gx^2 + Gy^2)
+            if (sum > 255)      sum = 255;               // Если переполнение
+            if (sum < 0)        sum = 0;                 // Если недополнение
+            res_im.at<uchar>(y, x) = sum;                // Запись результата в пиксель
         }
     }
-
-    // По ключу определяется градиент (X / Y)
-    if (key == 0)
-        return xGradient(buff);
-    else
-        return yGradient(buff);
-}
-
-void f_thread(Mat image, int delta_y, int height, int width, int threads, int iterartor)
-{
-    Mat res = image.clone();
-
-    int rest = 0;
-    int terty = 0;
-    int gx, gy, sum;
-
-    if ((height - delta_y * iterartor) < delta_y)
-        rest = height - delta_y * iterartor - 4;
-
-    // Проход по координатам
-    for (int y = 1; y < (delta_y + rest); y++) {
-        for (int x = 1; x < width; x++) {
-            gx = Gradient(image, x, y, delta_y + rest, width, 0);       // Вычисление Gx
-            gy = Gradient(image, x, y, delta_y + rest, width, 1);       // Вычисление Gy
-            sum = sqrt(gx * gx + gy * gy);                              // √(Gx^2 + Gy^2)
-            if (sum > 255)      sum = 255;                              // Если переполнение
-            if (sum < 0)        sum = 0;                                // Если недополнение
-            terty = iterartor * (delta_y - 1) + y;
-            res_im.at<uchar>(terty, x) = sum;
-        }// for columns
-    }// for rows
-
-    return;
 }
 
 int main()
-{
-    //const char * image = "lena.jpg";
-    const char *image = "Stasya.jpg";
+{           
+    int n_thread = 32;                                    // Количество потоков
 
-    // Чтение изображения
-    Mat bw_im = imread(image, IMREAD_GRAYSCALE);        // Открыть в ЧБ
-    Mat color_im = imread(image, IMREAD_COLOR);         // Открыть в цвете
-    res_im = bw_im.clone();                             // Результат
+    ofstream fout("test_records.txt", ios::app);
 
-    int height = bw_im.rows;                            // Высота изображения
-    int width = bw_im.cols;                             // Ширина изображения
+    const char *image = "kotya.jpg";
+    //const char *image = "Stasya.jpg";
 
-    cout << "image: " << height << " x " << width << endl;
-    
-    // Проверка на открытие
-    if (!bw_im.data)
-        return -1;
+    // Открытие картинок
+    Mat bw_im = imread(image, IMREAD_GRAYSCALE);         // ЧБ
+    Mat original = imread(image, IMREAD_COLOR);          // Оригинал
+    Mat res_im = bw_im.clone();                          // Результат
 
-    // Разделение на строчки
-    const int n_threads = 32;                            // Количество потоков
-    int delta_y = height / n_threads;                    // Размер обрабатываемых сегментов
+    // Заполнение чёрным
+    for (int y = 0; y < bw_im.rows; y++)
+        for (int x = 0; x < bw_im.cols; x++)
+            res_im.at<uchar>(y, x) = 0;
 
-    for (int i = 0; i < n_threads; i++)
+    // Разбиение на отрезки
+    int delta_y = (bw_im.rows - 1) / n_thread;
+    int y1 = 1;
+    int y2 = delta_y;
+
+    clock_t time_start = clock();                       // Начало отсчёта
+    for (int i_thread = 0; i_thread < n_thread; i_thread++)
     {
-        Mat part_im;
-        part_im = bw_im(Rect(0, i * delta_y, width, delta_y));
-        thread t (f_thread, part_im, delta_y+1, height, width, n_threads, i);
-        t.join();
-    }
+        if (i_thread == n_thread - 1)
+            thread{ Sobel_Filter, bw_im, res_im, y1, y2 }.join();
+        else
+            thread{ Sobel_Filter, bw_im, res_im, y1, y2 }.detach();
 
-    // Вывод изображения с фильтром
-    Sleep(1000);                                         // Дождаться обработки
-    namedWindow("final");
-    imshow("final", res_im);
+        // Переход к следующему отрезку
+        y1 = y2;
+        y2 += delta_y;
+    }
+    clock_t time_end = clock();                         // Конец отсчёта
+    double seconds = (double)(time_end - time_start) / CLOCKS_PER_SEC;
+    cout << n_thread << " threads " << " -- " << seconds * 1000 << " ms" << endl;
+    fout << n_thread << " threads "  << " -- " << seconds * 1000 << " ms" << endl;
+
+    namedWindow("Результат");
+    imshow("Результат", res_im);
+
+    namedWindow("Оригинал");
+    imshow("Оригинал ", original);
+
     waitKey();
+
     return 0;
 }
