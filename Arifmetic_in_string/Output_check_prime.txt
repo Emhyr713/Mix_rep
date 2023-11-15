@@ -1,0 +1,9 @@
+num_prime_int_1: 18014398241046527
+num_prime_str_1: 2147483647
+count_prime: 2000
+_____________________________
+checking_prime: 1
+search_prime: 17387
+_____________________________
+checking_prime_str: 1
+search_prime_str: 17383
