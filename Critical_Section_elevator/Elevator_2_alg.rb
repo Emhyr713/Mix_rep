@@ -75,8 +75,6 @@ class Call
         # Заблокировать
         @current_call.wait
 
-        # sort_waiting(elevator.mode)
-
         # Если направление совпало или поменялось, удалить из ожидания и добавить в активные
         $waiting_calls    -= 1
         $waiting_list.shift

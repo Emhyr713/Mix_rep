@@ -111,11 +111,3 @@ end
 
 calls_Elevator.join
 calls_work.join
-
-# сompleted_list = сompleted_list.sort_by {| a | [a.floorEnd, a.direction] }
-# i = 0
-# c.times do
-#   puts("#{сompleted_list[i].floorEnd} " )
-#   i += 1
-# end
-# сompleted_list.sort_by { |a| [a.floorEnd]}
